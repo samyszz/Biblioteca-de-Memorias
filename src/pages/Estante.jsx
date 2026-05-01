@@ -14,7 +14,7 @@ import { uploadImageToCloudinary } from '../services/cloudinary';
 import logoUrl from '../assets/logo.png';
 
 export const Estante = () => {
-  const [view, setView] = useState('all'); // 'all', 'favorites', 'trash'
+  const [view, setView] = useState('all');
   const [livroAberto, setLivroAberto] = useState(null);
   const [showModalLivro, setShowModalLivro] = useState(false);
   const [showModalMemoria, setShowModalMemoria] = useState(false);
@@ -41,7 +41,6 @@ export const Estante = () => {
     { name: 'Menta', bg: 'bg-[#55D8C1]', border: 'border-[#45B09E]' },
   ];
 
-  // 1. Busca os livros conforme o filtro da Sidebar
   useEffect(() => {
     let q;
     if (view === 'favorites') {
@@ -51,13 +50,11 @@ export const Estante = () => {
     } else {
       q = query(collection(db, 'livros'), where('isDeleted', '==', false), orderBy('createdAt', 'desc'));
     }
-
     return onSnapshot(q, (snapshot) => {
       setLivros(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
   }, [view]);
 
-  // 2. Busca memórias do livro aberto
   useEffect(() => {
     if (livroAberto) {
       const q = query(collection(db, 'memorias'), where('livroId', '==', livroAberto.id), orderBy('createdAt', 'asc'));
@@ -67,7 +64,6 @@ export const Estante = () => {
     }
   }, [livroAberto]);
 
-  // Funções de Gerenciamento de Livros
   const handleToggleFavorite = async (livro, e) => {
     e.stopPropagation();
     await updateDoc(doc(db, 'livros', livro.id), { isFavorite: !livro.isFavorite });
@@ -144,37 +140,37 @@ export const Estante = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#FFF9F5] font-sans relative overflow-hidden">
-      <Sidebar setView={setView} currentView={view} className="z-30" />
+    <div className="flex flex-col lg:flex-row min-h-screen bg-[#FFF9F5] font-sans relative overflow-x-hidden">
+      <Sidebar setView={setView} currentView={view} className="z-30 lg:w-72" />
 
-      <main className="flex-1 p-8 relative z-10 h-screen no-scrollbar">
+      <main className="flex-1 p-4 md:p-8 relative z-10 min-h-screen lg:h-screen lg:overflow-y-auto no-scrollbar pb-24 lg:pb-8">
         {!livroAberto ? (
           <div className="animate-in fade-in duration-700">
-            <header className="flex justify-between items-center mb-10">
-              <img src={logoUrl} alt="Hello, Samy" className="h-23 w-auto" />
-              <button onClick={() => setShowModalLivro(true)} className="bg-[#B599FF] text-[#4E2A3E] font-black px-8 py-5 rounded-[2rem] shadow-xl flex items-center gap-3">
+            <header className="flex flex-col sm:flex-row justify-between items-center gap-6 mb-10">
+              <img src={logoUrl} alt="Hello, Samy" className="h-16 md:h-23 w-auto" />
+              <button onClick={() => setShowModalLivro(true)} className="w-full sm:w-auto bg-[#B599FF] text-[#4E2A3E] font-black px-6 py-4 md:px-8 md:py-5 rounded-[1.5rem] md:rounded-[2rem] shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-transform">
                 <Plus size={20} /> Novo capítulo
               </button>
             </header>
 
-            <div className="bg-[#5C3D2E]/5 rounded-[4rem] p-12 border border-white/50 shadow-inner relative">
-               <h3 className="text-5xl font-black text-[#4E2A3E] tracking-tighter italic mb-12 uppercase">
+            <div className="bg-[#5C3D2E]/5 rounded-[2rem] md:rounded-[4rem] p-6 md:p-12 border border-white/50 shadow-inner relative">
+               <h3 className="text-3xl md:text-5xl font-black text-[#4E2A3E] tracking-tighter italic mb-8 md:ml-2 uppercase">
                 {view === 'favorites' ? 'Favoritos' : view === 'trash' ? 'Lixeira' : 'Minha Estante'}
                </h3>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
                 {livros.map((livro) => (
-                  <div key={livro.id} onClick={() => !livro.isDeleted && setLivroAberto(livro)} className={`${livro.cor} rounded-3xl p-5 border-l-[12px] ${livro.border} shadow-2xl hover:-translate-y-4 transition-all duration-500 cursor-pointer group relative`}>
-                    <button onClick={(e) => handleToggleFavorite(livro, e)} className="absolute top-4 left-4 p-2 bg-white/20 rounded-full text-white opacity-0 group-hover:opacity-100 hover:scale-110">
+                  <div key={livro.id} onClick={() => !livro.isDeleted && setLivroAberto(livro)} className={`${livro.cor} rounded-3xl p-4 md:p-5 border-l-[8px] md:border-l-[12px] ${livro.border} shadow-2xl hover:-translate-y-2 lg:hover:-translate-y-4 transition-all duration-500 cursor-pointer group relative`}>
+                    <button onClick={(e) => handleToggleFavorite(livro, e)} className="absolute top-3 left-3 p-2 bg-white/20 rounded-full text-white lg:opacity-0 lg:group-hover:opacity-100 hover:scale-110">
                       <Star size={18} fill={livro.isFavorite ? "white" : "none"} />
                     </button>
-                    <button onClick={(e) => { e.stopPropagation(); setLivroSelecionado(livro); setShowModalLivroOpcoes(true); }} className="absolute top-4 right-4 p-2 bg-white/20 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"><MoreHorizontal size={18} /></button>
-                    <div className="text-center mb-5 relative z-10 font-black text-white uppercase tracking-tighter">
-                      <h5 className="text-2xl leading-none mb-1">{livro.titulo}</h5>
+                    <button onClick={(e) => { e.stopPropagation(); setLivroSelecionado(livro); setShowModalLivroOpcoes(true); }} className="absolute top-3 right-3 p-2 bg-white/20 rounded-full text-white lg:opacity-0 lg:group-hover:opacity-100 transition-opacity"><MoreHorizontal size={18} /></button>
+                    <div className="text-center mb-4 relative z-10 font-black text-white uppercase tracking-tighter">
+                      <h5 className="text-xl md:text-2xl leading-none mb-1 truncate px-2">{livro.titulo}</h5>
                       <span className="text-white/60 text-[10px]">{livro.ano}</span>
                     </div>
                     <div className="aspect-[3/4] bg-white/20 rounded-2xl overflow-hidden border border-white/30 relative z-10">
-                      <img src={livro.img} className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" />
+                      <img src={livro.img} className="w-full h-full object-cover lg:group-hover:scale-110 transition-all duration-700" alt={livro.titulo} />
                     </div>
                   </div>
                 ))}
@@ -183,34 +179,50 @@ export const Estante = () => {
           </div>
         ) : (
           <div className="h-full flex flex-col animate-in fade-in duration-500">
-            <button onClick={() => setLivroAberto(null)} className="flex items-center gap-2 text-[#4E2A3E] font-black uppercase text-xs mb-8 hover:text-[#FF99C8] transition-colors font-bold"><ArrowLeft size={18} /> Voltar para a estante</button>
-            <div className="flex-1 flex items-center justify-center perspective-[2000px] pb-10">
-              <div className="relative w-full max-w-5xl h-[600px] flex shadow-[0_50px_100px_rgba(78,42,62,0.2)] rounded-[3rem] overflow-hidden bg-white">
-                <div className={`w-1/2 ${livroAberto.cor} p-16 flex flex-col justify-between border-r border-black/10`}>
-                   <h2 className="text-6xl font-black italic text-white tracking-tighter uppercase leading-none">{livroAberto.titulo}</h2>
-                   <div className="bg-white/10 p-6 rounded-3xl text-white font-bold uppercase text-xs tracking-widest">Capítulo: {livroAberto.ano}</div>
+            <button onClick={() => setLivroAberto(null)} className="flex items-center gap-2 text-[#4E2A3E] font-black uppercase text-xs mb-8 hover:text-[#FF99C8] transition-colors">
+              <ArrowLeft size={18} /> Voltar para a estante
+            </button>
+
+            <div className="flex-1 flex items-center justify-center lg:perspective-[2000px] pb-10">
+              <div className="relative w-full max-w-5xl lg:h-[600px] flex flex-col lg:flex-row shadow-2xl lg:shadow-[0_50px_100px_rgba(78,42,62,0.2)] rounded-[2rem] lg:rounded-[3rem] overflow-hidden bg-white">
+                {/* CAPA */}
+                <div className={`w-full lg:w-1/2 ${livroAberto.cor} p-8 lg:p-16 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-black/10`}>
+                   <h2 className="text-4xl lg:text-6xl font-black italic text-white tracking-tighter uppercase leading-none break-words">{livroAberto.titulo}</h2>
+                   <div className="mt-6 lg:mt-0 bg-white/10 p-4 lg:p-6 rounded-2xl lg:rounded-3xl text-white font-bold uppercase text-[10px] lg:text-xs tracking-widest text-center lg:text-left">Capítulo: {livroAberto.ano}</div>
                 </div>
-                <div className="w-1/2 bg-[#FFF9F5] p-12 flex flex-col relative shadow-[inset_20px_0_40px_rgba(0,0,0,0.05)] overflow-hidden">
+
+                {/* PÁGINAS */}
+                <div className="w-full lg:w-1/2 bg-[#FFF9F5] p-6 lg:p-12 flex flex-col relative shadow-[inset_0_20px_40px_rgba(0,0,0,0.02)] lg:shadow-[inset_20px_0_40px_rgba(0,0,0,0.05)]">
                   <header className="flex justify-between items-center mb-6">
-                    <h4 className="text-[#4E2A3E] font-black text-xs uppercase tracking-widest">Página {paginaAtual + 1} de {memorias.length || 1}</h4>
+                    <h4 className="text-[#4E2A3E] font-black text-[10px] lg:text-xs uppercase tracking-widest">Pág {paginaAtual + 1} de {memorias.length || 1}</h4>
                     <button onClick={() => setShowModalMemoria(true)} className="p-3 bg-[#B599FF]/20 text-[#4E2A3E] rounded-full hover:bg-[#B599FF]/40 shadow-sm"><Plus size={20} /></button>
                   </header>
-                  <div className="flex-1 flex flex-col items-center justify-center relative">
+
+                  <div className="flex-1 flex flex-col items-center justify-center relative min-h-[300px]">
                     <AnimatePresence mode="wait">
-                      <motion.div key={paginaAtual} initial={{ rotateY: 90, opacity: 0 }} animate={{ rotateY: 0, opacity: 1 }} exit={{ rotateY: -90, opacity: 0 }} transition={{ duration: 0.4 }} onClick={() => { if(memorias[paginaAtual]) { setMemoriaSelecionada(memorias[paginaAtual]); setShowModalOpcoes(true); }}} className="bg-white p-3 pb-10 shadow-lg border border-[#4E2A3E]/5 max-w-[80%] rotate-1 hover:rotate-0 transition-transform cursor-pointer group relative">
+                      <motion.div 
+                        key={paginaAtual} 
+                        initial={{ rotateY: 90, opacity: 0 }} 
+                        animate={{ rotateY: 0, opacity: 1 }} 
+                        exit={{ rotateY: -90, opacity: 0 }} 
+                        transition={{ duration: 0.4 }} 
+                        onClick={() => { if(memorias[paginaAtual]) { setMemoriaSelecionada(memorias[paginaAtual]); setShowModalOpcoes(true); }}} 
+                        className="bg-white p-3 pb-8 md:pb-10 shadow-lg border border-[#4E2A3E]/5 w-full max-w-[260px] md:max-w-[80%] rotate-1 hover:rotate-0 transition-transform cursor-pointer group relative"
+                      >
                         {memorias[paginaAtual] ? (
                           <>
                             <div className="absolute top-2 right-2 p-1 bg-[#4E2A3E]/5 rounded-full text-[#4E2A3E]/30"><MoreHorizontal size={14} /></div>
-                            {memorias[paginaAtual].url && <img src={memorias[paginaAtual].url} className="aspect-square w-full object-cover rounded-sm mb-3" />}
-                            <p className="text-[#4E2A3E] font-bold italic text-xs text-center px-2 leading-tight">{memorias[paginaAtual].texto}</p>
+                            {memorias[paginaAtual].url && <img src={memorias[paginaAtual].url} className="aspect-square w-full object-cover rounded-sm mb-3" alt="Memória" />}
+                            <p className="text-[#4E2A3E] font-bold italic text-[10px] md:text-xs text-center px-2 leading-tight break-words">{memorias[paginaAtual].texto}</p>
                           </>
-                        ) : <p className="text-[#4E2A3E]/40 italic font-medium">Folha em branco...</p>}
+                        ) : <p className="text-[#4E2A3E]/40 italic font-medium text-sm">Folha em branco...</p>}
                       </motion.div>
                     </AnimatePresence>
                   </div>
+
                   <div className="flex justify-between mt-8 pt-4 border-t border-[#4E2A3E]/5">
-                    <button disabled={paginaAtual === 0} onClick={() => setPaginaAtual(prev => prev - 1)} className="p-4 bg-white shadow-md rounded-2xl text-[#4E2A3E] disabled:opacity-20 hover:scale-110 transition-all"><ArrowLeft size={24} /></button>
-                    <button disabled={paginaAtual >= memorias.length - 1 || memorias.length === 0} onClick={() => setPaginaAtual(prev => prev + 1)} className="p-4 bg-white shadow-md rounded-2xl text-[#4E2A3E] disabled:opacity-20 hover:scale-110 transition-all rotate-180"><ArrowLeft size={24} /></button>
+                    <button disabled={paginaAtual === 0} onClick={() => setPaginaAtual(prev => prev - 1)} className="p-4 bg-white shadow-md rounded-2xl text-[#4E2A3E] disabled:opacity-20 active:scale-90 transition-all"><ArrowLeft size={24} /></button>
+                    <button disabled={paginaAtual >= memorias.length - 1 || memorias.length === 0} onClick={() => setPaginaAtual(prev => prev + 1)} className="p-4 bg-white shadow-md rounded-2xl text-[#4E2A3E] disabled:opacity-20 active:scale-90 transition-all rotate-180"><ArrowLeft size={24} /></button>
                   </div>
                 </div>
               </div>
@@ -219,27 +231,27 @@ export const Estante = () => {
         )}
       </main>
 
-      {/* MODAL: OPÇÕES DO LIVRO (MUDAR COR/LIXEIRA) */}
+      {/* MODAL OPÇÕES LIVRO */}
       {showModalLivroOpcoes && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#4E2A3E]/60 backdrop-blur-sm" onClick={() => setShowModalLivroOpcoes(false)} />
-          <div className="bg-white w-full max-w-xs rounded-[2.5rem] p-8 relative z-10 shadow-2xl border-4 border-[#4E2A3E]">
-             <h4 className="text-[#4E2A3E] font-black italic text-xl mb-6 text-center uppercase tracking-tighter">Opções</h4>
+          <div className="bg-white w-full max-w-xs rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 relative z-10 shadow-2xl border-4 border-[#4E2A3E] animate-in zoom-in-95">
+             <h4 className="text-[#4E2A3E] font-black italic text-lg md:text-xl mb-6 text-center uppercase tracking-tighter">Opções</h4>
              <div className="space-y-4">
                 {livroSelecionado?.isDeleted ? (
                   <>
-                    <button onClick={handleRecoverLivro} className="w-full flex items-center justify-center gap-3 py-4 bg-green-50 text-green-600 font-black rounded-2xl"><History size={18} /> Recuperar</button>
-                    <button onClick={handlePermanentDelete} className="w-full flex items-center justify-center gap-3 py-4 bg-red-50 text-red-500 font-black rounded-2xl"><Trash2 size={18} /> Excluir de vez</button>
+                    <button onClick={handleRecoverLivro} className="w-full flex items-center justify-center gap-3 py-3 md:py-4 bg-green-50 text-green-600 font-black rounded-xl md:rounded-2xl active:scale-95 transition-transform"><History size={18} /> Recuperar</button>
+                    <button onClick={handlePermanentDelete} className="w-full flex items-center justify-center gap-3 py-3 md:py-4 bg-red-50 text-red-500 font-black rounded-xl md:rounded-2xl active:scale-95 transition-transform"><Trash2 size={18} /> Excluir de vez</button>
                   </>
                 ) : (
                   <>
                     <div className="space-y-2 text-center">
                       <p className="text-[10px] font-black uppercase tracking-widest text-[#4E2A3E]/40 flex items-center justify-center gap-2"><Palette size={12} /> Mudar Cor</p>
                       <div className="flex gap-2 justify-center">
-                        {coresDisponiveis.map((c) => (<button key={c.name} onClick={() => { updateDoc(doc(db, 'livros', livroSelecionado.id), { cor: c.bg, border: c.border }); setShowModalLivroOpcoes(false); }} className={`w-8 h-8 rounded-full ${c.bg} ${c.border} border-2 hover:scale-110 transition-transform`} />))}
+                        {coresDisponiveis.map((c) => (<button key={c.name} onClick={() => { updateDoc(doc(db, 'livros', livroSelecionado.id), { cor: c.bg, border: c.border }); setShowModalLivroOpcoes(false); }} className={`w-7 h-7 md:w-8 md:h-8 rounded-full ${c.bg} ${c.border} border-2 hover:scale-110 active:scale-90 transition-transform`} />))}
                       </div>
                     </div>
-                    <button onClick={handleMoveToTrash} className="w-full flex items-center justify-center gap-3 py-4 bg-red-50 text-red-500 font-black rounded-2xl hover:bg-red-500 hover:text-white transition-all"><Trash2 size={18} /> Mover para Lixeira</button>
+                    <button onClick={handleMoveToTrash} className="w-full flex items-center justify-center gap-3 py-3 md:py-4 bg-red-50 text-red-500 font-black rounded-xl md:rounded-2xl active:scale-95 transition-transform"><Trash2 size={18} /> Mover para Lixeira</button>
                   </>
                 )}
                 <button onClick={() => setShowModalLivroOpcoes(false)} className="w-full py-2 text-[#4E2A3E]/40 font-bold text-xs uppercase tracking-widest">Voltar</button>
@@ -248,22 +260,22 @@ export const Estante = () => {
         </div>
       )}
 
-      {/* MODAIS: NOVO LIVRO, TEXTO E MEMÓRIA (MESMO PADRÃO COZY TECH) */}
+      {/* MODAL NOVO LIVRO */}
       {showModalLivro && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-[#4E2A3E]/40 backdrop-blur-md" onClick={() => setShowModalLivro(false)} />
-          <div className="bg-white w-full max-w-xl rounded-[3.5rem] shadow-2xl border-4 border-[#4E2A3E] relative z-10 p-10 animate-in zoom-in-95">
-            <h3 className="text-4xl font-black text-[#4E2A3E] italic mb-8 uppercase tracking-tighter leading-none">Novo Capítulo</h3>
-            <form onSubmit={handleAddLivro} className="space-y-6">
-              <input value={novoTitulo} onChange={(e) => setNovoTitulo(e.target.value)} type="text" placeholder="Nome do Livro" className="w-full px-8 py-5 bg-[#4E2A3E]/5 rounded-[2rem] border-none text-[#4E2A3E] font-bold focus:ring-4 focus:ring-[#B599FF]/20" />
-              <div className="flex gap-4 ml-4">
-                {coresDisponiveis.map((c) => (<button key={c.name} type="button" onClick={() => setCorSelecionada(c)} className={`w-10 h-10 rounded-full ${c.bg} ${c.border} border-4 transition-transform ${corSelecionada.bg === c.bg ? 'scale-125 border-white shadow-lg' : 'opacity-40 hover:opacity-100'}`} />))}
+          <div className="bg-white w-full max-w-xl rounded-[2rem] md:rounded-[3.5rem] shadow-2xl border-4 border-[#4E2A3E] relative z-10 p-6 md:p-10 animate-in zoom-in-95">
+            <h3 className="text-2xl md:text-4xl font-black text-[#4E2A3E] italic mb-6 md:mb-8 uppercase tracking-tighter leading-none">Novo Capítulo</h3>
+            <form onSubmit={handleAddLivro} className="space-y-5 md:space-y-6">
+              <input value={novoTitulo} onChange={(e) => setNovoTitulo(e.target.value)} type="text" placeholder="Nome do Livro" className="w-full px-6 py-4 md:px-8 md:py-5 bg-[#4E2A3E]/5 rounded-2xl md:rounded-[2rem] border-none text-[#4E2A3E] font-bold focus:ring-4 focus:ring-[#B599FF]/20" />
+              <div className="flex gap-3 md:gap-4 ml-2">
+                {coresDisponiveis.map((c) => (<button key={c.name} type="button" onClick={() => setCorSelecionada(c)} className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${c.bg} ${c.border} border-4 transition-transform ${corSelecionada.bg === c.bg ? 'scale-125 border-white shadow-lg' : 'opacity-40 active:scale-90'}`} />))}
               </div>
-              <div className="flex items-center justify-center w-full h-40 border-4 border-dashed border-[#4E2A3E]/10 rounded-[2rem] bg-[#4E2A3E]/5 relative">
-                {imagemCapa ? <img src={URL.createObjectURL(imagemCapa)} className="w-full h-full object-cover rounded-[1.8rem]" /> : <div className="text-center text-[#4E2A3E]/40 uppercase text-[10px] font-black"><Upload className="mx-auto mb-2" /> Foto da Capa</div>}
+              <div className="flex items-center justify-center w-full h-32 md:h-40 border-4 border-dashed border-[#4E2A3E]/10 rounded-2xl md:rounded-[2rem] bg-[#4E2A3E]/5 relative">
+                {imagemCapa ? <img src={URL.createObjectURL(imagemCapa)} className="w-full h-full object-cover rounded-[1.2rem] md:rounded-[1.8rem]" alt="Preview" /> : <div className="text-center text-[#4E2A3E]/40 uppercase text-[10px] font-black"><Upload className="mx-auto mb-2" /> Foto da Capa</div>}
                 <input type="file" accept="image/*" onChange={(e) => setImagemCapa(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
               </div>
-              <button disabled={loading} className="w-full bg-[#4E2A3E] text-white font-black py-5 rounded-[2rem] shadow-xl hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest">{loading ? "Enviando..." : "Criar Capítulo"}</button>
+              <button disabled={loading} className="w-full bg-[#4E2A3E] text-white font-black py-4 md:py-5 rounded-2xl md:rounded-[2rem] shadow-xl active:scale-95 transition-transform uppercase tracking-widest">{loading ? "Enviando..." : "Criar Capítulo"}</button>
             </form>
           </div>
         </div>

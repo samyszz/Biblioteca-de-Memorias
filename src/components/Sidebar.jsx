@@ -29,7 +29,8 @@ export const Sidebar = ({ setView, currentView }) => {
   ];
 
   return (
-    <aside className="w-72 bg-white border-r border-[#4E2A3E]/5 h-screen flex flex-col p-8 sticky top-0 z-30">
+    <aside className="w-full lg:w-72 bg-white border-t lg:border-r border-[#4E2A3E]/5 h-auto lg:h-screen flex flex-row lg:flex-col p-4 lg:p-8 fixed bottom-0 lg:sticky top-auto lg:top-0 z-30">
+  {/* Ajuste os itens para ficarem lado a lado no mobile */}
       
       {/* BRANDING (MANTENDO O ESTILO HELLO, SAMY) */}
       <div className="mb-12">
