@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+:root {
+  /* Definindo as cores do seu protótipo v4 style */
+  --color-memoria-purple: #4E2A3E;
+  --color-memoria-lavender: #D6CFFF;
+  --color-memoria-peach: #FFDAB9;
+  --color-memoria-cream: #FFF8F0;
+  --color-memoria-pink: #F3C5C5;
+  
+  --font-sans: "Poppins", ui-sans-serif, system-ui;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-memoria-cream);
+    color: var(--color-memoria-purple);
+  }
+}
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
