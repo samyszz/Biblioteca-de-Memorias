@@ -82,7 +82,7 @@ export const Auth = () => {
                         type="text" 
                         value={nome}
                         onChange={(e) => setNome(e.target.value)}
-                        placeholder="Samyra Alves" 
+                        placeholder="Seu nome completo" 
                         className="w-full bg-transparent outline-none text-[#4E2A3E] font-semibold placeholder:text-[#4E2A3E]/20" 
                       />
                     </div>
