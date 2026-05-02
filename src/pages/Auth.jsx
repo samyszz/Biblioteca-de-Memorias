@@ -152,7 +152,7 @@ export const Auth = () => {
         </div>
 
         {/* LADO DIREITO: DASHBOARD PREVIEW (ESTÉTICA DO PROJETO) */}
-        <div className="hidden lg:flex w-[55%] h-full bg-[#B599FF]/10 relative items-center justify-center p-12 overflow-hidden">
+        <div className="hidden lg:flex w-[55%] h-full bg-[#d9ccff]/10 relative items-center justify-center p-12 overflow-hidden">
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
                style={{ backgroundImage: `radial-gradient(circle at 2px 2px, #4E2A3E 1px, transparent 0)`, backgroundSize: '32px 32px' }} />
 
@@ -160,7 +160,7 @@ export const Auth = () => {
             {/* Card Principal: Mini Estante */}
             <div className="absolute bg-white p-6 rounded-3xl shadow-2xl border border-[#4E2A3E]/5 w-64 animate-bounce">
                <div className="flex justify-between items-center mb-6">
-                 <div className="h-2 w-12 bg-[#B599FF] rounded-full" />
+                 <div className="h-2 w-12 bg-[#d9ccff] rounded-full" />
                  <Heart className="text-[#FF99C8] fill-[#FF99C8]" size={16} />
                </div>
                <div className="space-y-3">

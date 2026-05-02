@@ -46,8 +46,8 @@ export const Sidebar = ({ setView, currentView }) => {
             onClick={() => setView(item.id)}
             className={`w-full flex items-center gap-4 px-6 py-4 rounded-[1.5rem] font-bold transition-all group ${
               currentView === item.id 
-              ? 'bg-[#B599FF] text-[#4E2A3E] shadow-lg scale-[1.02]' 
-              : 'text-[#4E2A3E]/50 hover:bg-[#B599FF]/10 hover:text-[#4E2A3E]'
+              ? 'bg-[#d9ccff] text-[#4E2A3E] shadow-lg scale-[1.02]' 
+              : 'text-[#4E2A3E]/50 hover:bg-[#d9ccff]/10 hover:text-[#4E2A3E]'
             }`}
           >
             <item.icon size={20} strokeWidth={currentView === item.id ? 3 : 2} />
